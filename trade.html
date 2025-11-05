@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FLS Trading Platform</title>
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --success-color: #2ecc71;
+      --danger-color: #e74c3c;
+      --warning-color: #f39c12;
+      --light-bg: #f8f9fa;
+      --dark-bg: #343a40;
+      --border-radius: 6px;
+      --box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+      color: #333;
+    }
+    
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    @media (max-width: 1200px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    header {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, var(--primary-color), #1a2530);
+      color: white;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 20px;
+    }
+    
+    .panel {
+      background: white;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+    
+    .market-panel {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    
+    .market-card {
+      background: white;
+      padding: 15px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      text-align: center;
+      border-left: 4px solid var(--secondary-color);
+    }
+    
+    .market-card h3 {
+      margin-top: 0;
+      font-size: 1rem;
+      color: #666;
+    }
+    
+    .market-card .value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    
+    .market-card .change {
+      font-weight: bold;
+    }
+    
+    .green { color: var(--success-color); }
+    .red { color: var(--danger-color); }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    
+    th {
+      background-color: var(--light-bg);
+      font-weight: 600;
+    }
+    
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    
+    input, select, button {
+      margin: 5px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+    }
+    
+    button {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #2980b9;
+    }
+    
+    button.danger {
+      background-color: var(--danger-color);
+    }
+    
+    button.danger:hover {
+      background-color: #c0392b;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    
+    .chart-container {
+      height: 300px;
+      margin-top: 20px;
+    }
+    
+    .order-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .order-type {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    
+    .order-type label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: normal;
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: var(--border-radius);
+      color: white;
+      box-shadow: var(--box-shadow);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .notification.success {
+      background-color: var(--success-color);
+    }
+    
+    .notification.error {
+      background-color: var(--danger-color);
+    }
+    
+    .notification.show {
+      opacity: 1;
+    }
+    
+    .tab-container {
+      margin-top: 20px;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom: 3px solid var(--secondary-color);
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 15px 0;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .portfolio-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .portfolio-card {
+      background: var(--light-bg);
+      padding: 15px;
+      border-radius: var(--border-radius);
+      text-align: center;
+    }
+    
+    .portfolio-card .value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    
+    .portfolio-card .label {
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>FLS Trading Platform</h1>
+      <p>Real-time trading simulation with advanced features</p>
+    </header>
+    
+    <div class="panel market-panel">
+      <div class="market-card">
+        <h3>FLS Price</h3>
+        <div class="value" id="flsPrice">$100.00</div>
+        <div class="change green" id="priceChange">+0.00%</div>
+      </div>
+      
+      <div class="market-card">
+        <h3>24h Volume</h3>
+        <div class="value" id="volume">1,245,780</div>
+        <div class="change green" id="volumeChange">+0.0%</div>
+      </div>
+      
+      <div class="market-card">
+        <h3>Market Cap</h3>
+        <div class="value" id="marketCap">$2.45B</div>
+        <div class="change red" id="capChange">+0.0%</div>
+      </div>
+      
+      <div class="market-card">
+        <h3>Last Updated</h3>
+        <div class="value" id="lastUpdated">--:--:--</div>
+        <div class="change" id="updateStatus">Live</div>
+      </div>
+    </div>
+    
+    <div class="panel">
+      <h2>Portfolio</h2>
+      <div class="portfolio-summary">
+        <div class="portfolio-card">
+          <div class="label">Total Value</div>
+          <div class="value" id="totalValue">$0.00</div>
+        </div>
+        <div class="portfolio-card">
+          <div class="label">Cash Balance</div>
+          <div class="value" id="cashBalance">$0.00</div>
+        </div>
+        <div class="portfolio-card">
+          <div class="label">FLS Holdings</div>
+          <div class="value" id="flsHoldings">0</div>
+        </div>
+        <div class="portfolio-card">
+          <div class="label">Today's P&L</div>
+          <div class="value" id="dailyPnL">$0.00</div>
+        </div>
+      </div>
+      
+      <div class="chart-container" id="portfolioChart">
+        <canvas id="portfolioChartCanvas"></canvas>
+      </div>
+    </div>
+    
+    <div class="panel">
+      <h2>Trading</h2>
+      <div class="form-group">
+        <label for="tradeTrader">Select Trader</label>
+        <select id="tradeTrader">
+          <option value="">-- Select Trader --</option>
+        </select>
+      </div>
+      
+      <div class="order-controls">
+        <div class="form-group" style="flex: 1;">
+          <label for="tradePrice">Price</label>
+          <input type="number" id="tradePrice" placeholder="Price" step="0.01" />
+        </div>
+      </div>
+      
+      <div class="order-type">
+        <label><input type="radio" name="tradeType" value="market" checked /> Market Order</label>
+        <label><input type="radio" name="tradeType" value="limit" /> Limit Order</label>
+        <label><input type="radio" name="tradeType" value="stop" /> Stop Order</label>
+      </div>
+      
+      <div class="order-type">
+        <label><input type="radio" name="orderSide" value="buy" checked /> Buy</label>
+        <label><input type="radio" name="orderSide" value="sell" /> Sell</label>
+      </div>
+      
+      <button onclick="placeOrder()">Place Order</button>
+      
+      <div class="tab-container">
+        <div class="tabs">
+          <div class="tab active" data-tab="open-orders">Open Orders</div>
+          <div class="tab" data-tab="order-history">Order History</div>
+          <div class="tab" data-tab="trade-history">Trade History</div>
+        </div>
+        
+        <div class="tab-content active" id="open-orders">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Side</th>
+                <th>Type</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="openOrdersTable"></tbody>
+          </table>
+        </div>
+        
+        <div class="tab-content" id="order-history">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Side</th>
+                <th>Type</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="orderHistoryTable"></tbody>
+          </table>
+        </div>
+        
+        <div class="tab-content" id="trade-history">
+          <table>
+            <thead>
+              <tr>
+                <th>Trader</th>
+                <th>Side</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Value</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="tradeHistoryTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel">
+      <h2>Price Chart</h2>
+      <div class="chart-container">
+        <canvas id="priceChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="panel">
+      <h2>Add Trader</h2>
+      <div class="form-group">
+        <label for="traderName">Trader Name</label>
+        <input type="text" id="traderName" placeholder="Trader Name" />
+      </div>
+      
+      <div class="form-group">
+        <label for="traderBalance">Initial Balance</label>
+        <input type="number" id="traderBalance" placeholder="Initial Balance" min="0" step="0.01" />
+      </div>
+      
+      <button onclick="addTrader()">Add Trader</button>
+      
+      <h3>Trader List</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Balance</th>
+            <th>Holdings</th>
+            <th>Portfolio Value</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="traderTable"></tbody>
+      </table>
+    </div>
+  </div>
+  
+  <div id="notification" class="notification"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let flsPrice = 100.00;
+    let traders = [];
+    let orders = [];
+    let tradeHistory = [];
+    let priceHistory = [];
+    let portfolioHistory = [];
+    let chart, portfolioChart;
+    let volume = 1245780;
+    let marketCap = 2450000000;
+    const totalSupply = 24500000; // Total FLS in circulation
+    
+    // Initialize the platform
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeCharts();
+      updateMarketData();
+      setInterval(processOrders, 1000); // Process orders every second
+      
+      // Tab functionality
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          const tabId = this.getAttribute('data-tab');
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+    });
+    
+    function initializeCharts() {
+      const priceCtx = document.getElementById('priceChart').getContext('2d');
+      chart = new Chart(priceCtx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'FLS Price',
+            data: [],
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+      
+      const portfolioCtx = document.getElementById('portfolioChartCanvas').getContext('2d');
+      portfolioChart = new Chart(portfolioCtx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Portfolio Value',
+            data: [],
+            borderColor: '#2ecc71',
+            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+    
+    function updateMarketData() {
+      document.getElementById('flsPrice').textContent = `$${flsPrice.toFixed(2)}`;
+      
+      const priceChange = calculatePriceChange();
+      const priceChangeElement = document.getElementById('priceChange');
+      priceChangeElement.textContent = `${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(2)}%`;
+      priceChangeElement.className = priceChange >= 0 ? 'change green' : 'change red';
+      
+      document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+      
+      document.getElementById('volume').textContent = Math.round(volume).toLocaleString();
+      document.getElementById('marketCap').textContent = `$${(marketCap / 1000000000).toFixed(2)}B`;
+      
+      const now = new Date();
+      const timeLabel = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+      
+      priceHistory.push({ time: timeLabel, price: flsPrice });
+      if (priceHistory.length > 20) priceHistory.shift();
+      
+      chart.data.labels = priceHistory.map(item => item.time);
+      chart.data.datasets[0].data = priceHistory.map(item => item.price);
+      chart.update();
+      
+      updatePortfolioDisplay();
+    }
+    
+    function calculatePriceChange() {
+      if (priceHistory.length < 2) return 0;
+      const previousPrice = priceHistory[priceHistory.length - 2].price;
+      return ((flsPrice - previousPrice) / previousPrice * 100);
+    }
+    
+    function updatePortfolioDisplay() {
+      let totalValue = 0;
+      let totalCash = 0;
+      let totalHoldings = 0;
+      
+      traders.forEach(trader => {
+        const portfolioValue = trader.balance + (trader.holdings * flsPrice);
+        totalValue += portfolioValue;
+        totalCash += trader.balance;
+        totalHoldings += trader.holdings;
+      });
+      
+      document.getElementById('totalValue').textContent = `$${totalValue.toFixed(2)}`;
+      document.getElementById('cashBalance').textContent = `$${totalCash.toFixed(2)}`;
+      document.getElementById('flsHoldings').textContent = totalHoldings.toFixed(0);
+      
+      const now = new Date();
+      const timeLabel = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+      
+      portfolioHistory.push({ time: timeLabel, value: totalValue });
+      if (portfolioHistory.length > 20) portfolioHistory.shift();
+      
+      portfolioChart.data.labels = portfolioHistory.map(item => item.time);
+      portfolioChart.data.datasets[0].data = portfolioHistory.map(item => item.value);
+      portfolioChart.update();
+    }
+    
+    function addTrader() {
+      const name = document.getElementById('traderName').value.trim();
+      const balance = parseFloat(document.getElementById('traderBalance').value);
+      
+      if (!name || isNaN(balance) || balance < 0) {
+        showNotification('Please enter a valid name and balance', 'error');
+        return;
+      }
+      
+      if (traders.some(t => t.name === name)) {
+        showNotification('Trader name already exists', 'error');
+        return;
+      }
+      
+      traders.push({
+        id: traders.length + 1,
+        name,
+        balance,
+        holdings: 0,
+        created: new Date()
+      });
+      
+      updateTraderTable();
+      updateTraderDropdown();
+      
+      document.getElementById('traderName').value = '';
+      document.getElementById('traderBalance').value = '';
+      
+      showNotification(`Trader ${name} added successfully`, 'success');
+    }
+    
+    function updateTraderTable() {
+      const table = document.getElementById('traderTable');
+      table.innerHTML = '';
+      
+      traders.forEach(trader => {
+        const portfolioValue = trader.balance + (trader.holdings * flsPrice);
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+          <td>${trader.name}</td>
+          <td>$${trader.balance.toFixed(2)}</td>
+          <td>${trader.holdings}</td>
+          <td>$${portfolioValue.toFixed(2)}</td>
+          <td>
+            <button class="danger" onclick="removeTrader(${trader.id})">Remove</button>
+          </td>
+        `;
+        
+        table.appendChild(row);
+      });
+    }
+    
+    function updateTraderDropdown() {
+      const dropdown = document.getElementById('tradeTrader');
+      dropdown.innerHTML = '<option value="">-- Select Trader --</option>';
+      
+      traders.forEach(trader => {
+        const option = document.createElement('option');
+        option.value = trader.id;
+        option.textContent = trader.name;
+        dropdown.appendChild(option);
+      });
+    }
+    
+    function removeTrader(id) {
+      const traderIndex = traders.findIndex(t => t.id === id);
+      if (traderIndex === -1) return;
+      
+      const traderName = traders[traderIndex].name;
+      traders.splice(traderIndex, 1);
+      orders = orders.filter(order => order.traderId !== id);
+      
+      updateTraderTable();
+      updateTraderDropdown();
+      updateOpenOrdersTable();
+      
+      showNotification(`Trader ${traderName} removed`, 'success');
+    }
+    
+    function calculateOrderQuantity(trader, orderType, orderSide, orderPrice) {
+      if (orderSide === 'sell') {
+        return Math.floor(trader.holdings); // Sell all available holdings
+      }
+      
+      const price = orderType === 'limit' || orderType === 'stop' ? orderPrice : flsPrice;
+      if (!price || price <= 0) return 0;
+      
+      return Math.floor(trader.balance / price); // Calculate max affordable quantity
+    }
+    
+    function placeOrder() {
+      const traderId = parseInt(document.getElementById('tradeTrader').value);
+      const priceInput = document.getElementById('tradePrice').value;
+      const orderType = document.querySelector('input[name="tradeType"]:checked').value;
+      const orderSide = document.querySelector('input[name="orderSide"]:checked').value;
+      
+      if (isNaN(traderId) || traderId === '') {
+        showNotification('Please select a trader', 'error');
+        return;
+      }
+      
+      const trader = traders.find(t => t.id === traderId);
+      if (!trader) {
+        showNotification('Trader not found', 'error');
+        return;
+      }
+      
+      let orderPrice = null;
+      if (orderType === 'limit' || orderType === 'stop') {
+        if (!priceInput || isNaN(parseFloat(priceInput)) || parseFloat(priceInput) <= 0) {
+          showNotification('Please enter a valid price for limit/stop orders', 'error');
+          return;
+        }
+        orderPrice = parseFloat(priceInput);
+      }
+      
+      const qty = calculateOrderQuantity(trader, orderType, orderSide, orderPrice);
+      
+      if (qty <= 0) {
+        showNotification(orderSide === 'buy' ? 
+          'Insufficient balance for purchase' : 
+          'No holdings available to sell', 'error');
+        return;
+      }
+      
+      const order = {
+        id: orders.length + 1,
+        traderId,
+        traderName: trader.name,
+        type: orderType,
+        side: orderSide,
+        quantity: qty,
+        price: orderPrice,
+        status: 'open',
+        createdAt: new Date()
+      };
+      
+      orders.push(order);
+      
+      if (orderType === 'market') {
+        executeMarketOrder(order);
+      } else {
+        matchOrders();
+      }
+      
+      updateOpenOrdersTable();
+      document.getElementById('tradePrice').value = '';
+      
+      showNotification(`Order placed for ${qty} FLS`, 'success');
+    }
+    
+    function executeMarketOrder(order) {
+      const trader = traders.find(t => t.id === order.traderId);
+      if (!trader) return;
+      
+      const cost = order.quantity * flsPrice;
+      
+      if (order.side === 'buy' && trader.balance < cost) {
+        order.status = 'rejected';
+        showNotification(`Insufficient balance for ${trader.name}`, 'error');
+        return;
+      }
+      
+      if (order.side === 'sell' && trader.holdings < order.quantity) {
+        order.status = 'rejected';
+        showNotification(`Insufficient holdings for ${trader.name}`, 'error');
+        return;
+      }
+      
+      // Update trader portfolio
+      if (order.side === 'buy') {
+        trader.balance -= cost;
+        trader.holdings += order.quantity;
+      } else {
+        trader.balance += cost;
+        trader.holdings -= order.quantity;
+      }
+      
+      // Update price based on trade
+      const priceImpact = order.quantity / totalSupply * (order.side === 'buy' ? 0.5 : -0.5);
+      flsPrice = Math.max(0.01, (flsPrice * (1 + priceImpact)).toFixed(2));
+      marketCap = flsPrice * totalSupply;
+      volume += order.quantity;
+      
+      // Record trade
+      order.status = 'filled';
+      order.filledAt = new Date();
+      order.executedPrice = flsPrice;
+      
+      tradeHistory.unshift({
+        trader: trader.name,
+        type: order.side,
+        quantity: order.quantity,
+        price: flsPrice,
+        value: cost,
+        time: new Date().toLocaleTimeString()
+      });
+      
+      updateTradeHistoryTable();
+      updateTraderTable();
+      updateMarketData();
+    }
+    
+    function matchOrders() {
+      const buyOrders = orders.filter(o => o.status === 'open' && o.side === 'buy' && o.type === 'limit').sort((a, b) => b.price - a.price);
+      const sellOrders = orders.filter(o => o.status === 'open' && o.side === 'sell' && o.type === 'limit').sort((a, b) => a.price - b.price);
+      
+      while (buyOrders.length > 0 && sellOrders.length > 0) {
+        const buyOrder = buyOrders[0];
+        const sellOrder = sellOrders[0];
+        
+        if (buyOrder.price >= sellOrder.price) {
+          const quantity = Math.min(buyOrder.quantity, sellOrder.quantity);
+          const tradePrice = (buyOrder.price + sellOrder.price) / 2;
+          
+          const buyer = traders.find(t => t.id === buyOrder.traderId);
+          const seller = traders.find(t => t.id === sellOrder.traderId);
+          
+          if (!buyer || !seller) continue;
+          
+          const cost = quantity * tradePrice;
+          
+          if (buyer.balance < cost || seller.holdings < quantity) {
+            if (buyer.balance < cost) buyOrder.status = 'rejected';
+            if (seller.holdings < quantity) sellOrder.status = 'rejected';
+            continue;
+          }
+          
+          // Execute trade
+          buyer.balance -= cost;
+          buyer.holdings += quantity;
+          seller.balance += cost;
+          seller.holdings -= quantity;
+          
+          // Update price based on trade
+          flsPrice = tradePrice;
+          marketCap = flsPrice * totalSupply;
+          volume += quantity;
+          
+          // Update orders
+          buyOrder.quantity -= quantity;
+          sellOrder.quantity -= quantity;
+          
+          if (buyOrder.quantity === 0) {
+            buyOrder.status = 'filled';
+            buyOrder.filledAt = new Date();
+            buyOrder.executedPrice = tradePrice;
+            buyOrders.shift();
+          }
+          
+          if (sellOrder.quantity === 0) {
+            sellOrder.status = 'filled';
+            sellOrder.filledAt = new Date();
+            sellOrder.executedPrice = tradePrice;
+            sellOrders.shift();
+          }
+          
+          // Record trade
+          tradeHistory.unshift({
+            trader: buyer.name,
+            type: 'buy',
+            quantity: quantity,
+            price: tradePrice,
+            value: cost,
+            time: new Date().toLocaleTimeString()
+          });
+          
+          tradeHistory.unshift({
+            trader: seller.name,
+            type: 'sell',
+            quantity: quantity,
+            price: tradePrice,
+            value: cost,
+            time: new Date().toLocaleTimeString()
+          });
+          
+          updateTradeHistoryTable();
+          updateTraderTable();
+          updateMarketData();
+        } else {
+          break;
+        }
+      }
+      
+      orders = orders.filter(o => o.status === 'open' || o.quantity > 0);
+    }
+    
+    function processOrders() {
+      orders.forEach(order => {
+        if (order.status !== 'open') return;
+        
+        if (order.type === 'limit') {
+          matchOrders();
+        } else if (order.type === 'stop') {
+          if ((order.side === 'buy' && order.price && flsPrice >= order.price) ||
+              (order.side === 'sell' && order.price && flsPrice <= order.price)) {
+            order.type = 'market';
+            executeMarketOrder(order);
+          }
+        }
+      });
+      
+      updateOpenOrdersTable();
+    }
+    
+    function cancelOrder(orderId) {
+      const orderIndex = orders.findIndex(o => o.id === orderId);
+      if (orderIndex === -1) return;
+      
+      orders[orderIndex].status = 'cancelled';
+      orders[orderIndex].cancelledAt = new Date();
+      
+      updateOpenOrdersTable();
+      updateOrderHistoryTable();
+      
+      showNotification('Order cancelled', 'success');
+    }
+    
+    function updateOpenOrdersTable() {
+      const table = document.getElementById('openOrdersTable');
+      table.innerHTML = '';
+      
+      const openOrders = orders.filter(o => o.status === 'open');
+      
+      if (openOrders.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="7" style="text-align: center;">No open orders</td>';
+        table.appendChild(row);
+        return;
+      }
+      
+      openOrders.forEach(order => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+          <td>${order.id}</td>
+          <td>${order.side.charAt(0).toUpperCase() + order.side.slice(1)}</td>
+          <td>${order.type.charAt(0).toUpperCase() + order.type.slice(1)}</td>
+          <td>${order.quantity}</td>
+          <td>${order.price ? `$${order.price.toFixed(2)}` : 'Market'}</td>
+          <td>${order.status}</td>
+          <td>
+            <button class="danger" onclick="cancelOrder(${order.id})">Cancel</button>
+          </td>
+        `;
+        
+        table.appendChild(row);
+      });
+    }
+    
+    function updateOrderHistoryTable() {
+      const table = document.getElementById('orderHistoryTable');
+      table.innerHTML = '';
+      
+      const closedOrders = orders.filter(o => o.status !== 'open');
+      
+      if (closedOrders.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="7" style="text-align: center;">No order history</td>';
+        table.appendChild(row);
+        return;
+      }
+      
+      closedOrders.forEach(order => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+          <td>${order.id}</td>
+          <td>${order.side.charAt(0).toUpperCase() + order.side.slice(1)}</td>
+          <td>${order.type.charAt(0).toUpperCase() + order.type.slice(1)}</td>
+          <td>${order.quantity}</td>
+          <td>${order.executedPrice ? `$${order.executedPrice.toFixed(2)}` : 'N/A'}</td>
+          <td>${order.status}</td>
+          <td>${order.filledAt ? order.filledAt.toLocaleTimeString() : order.cancelledAt.toLocaleTimeString()}</td>
+        `;
+        
+        table.appendChild(row);
+      });
+    }
+    
+    function updateTradeHistoryTable() {
+      const table = document.getElementById('tradeHistoryTable');
+      table.innerHTML = '';
+      
+      if (tradeHistory.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="6" style="text-align: center;">No trade history</td>';
+        table.appendChild(row);
+        return;
+      }
+      
+      tradeHistory.slice(0, 20).forEach(trade => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+          <td>${trade.trader}</td>
+          <td>${trade.type.charAt(0).toUpperCase() + trade.type.slice(1)}</td>
+          <td>${trade.quantity}</td>
+          <td>$${trade.price.toFixed(2)}</td>
+          <td>$${trade.value.toFixed(2)}</td>
+          <td>${trade.time}</td>
+        `;
+        
+        table.appendChild(row);
+      });
+    }
+    
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
